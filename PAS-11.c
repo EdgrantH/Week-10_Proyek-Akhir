@@ -31,7 +31,18 @@ double hitung_tinggi(double sudut, double jarak, int keakuratan);
 
 
 int main(){
-    printf("%lf", hitung_tinggi(36.87, 12, 10));
+    double start_time, end_time, elapsed_time;
+    
+    start_time = omp_get_wtime();
+    printf("%lf\n", hitung_tinggi(36.87, 12, 10));
+    printf("%lf\n", hitung_tinggi(36.87, 16, 10));
+    printf("%lf\n", hitung_tinggi(36.87, 20, 10));
+    printf("%lf\n", hitung_tinggi(36.87, 120, 10));
+    end_time = omp_get_wtime();
+
+    elapsed_time = end_time - start_time;
+
+    printf("Elapsed time: %f seconds\n", elapsed_time);
 
     return 0;
 }
@@ -68,11 +79,34 @@ double akar(double x) {
 
     double guess = x;
     double nextGuess = 0.5 * (guess + x / guess);
-    double epsilon = 1e-7; // keakuratan
+    double epsilon = 1e-7; // Desired level of precision
+    int stopCalculation = 0; // Flag to indicate stopping the calculation
+    int terminateLoop = 0; // Flag to indicate terminating the loop
 
-    while (mutlak(nextGuess - guess) >= epsilon) {
-        guess = nextGuess;
-        nextGuess = 0.5 * (guess + x / guess);
+    #pragma omp parallel shared(stopCalculation, terminateLoop)
+    {
+        while (!terminateLoop) {
+            guess =+ omp_get_thread_num();
+            // Check if the stopCalculation flag is set
+            #pragma omp critical
+            {
+                if (stopCalculation) {
+                    terminateLoop = 1;
+                }
+            }
+
+            guess = nextGuess;
+            nextGuess = 0.5 * (guess + x / guess);
+
+            // Check if the desired value is reached
+            if (mutlak(nextGuess - guess) < epsilon) {
+                // Set the stopCalculation flag for all threads
+                #pragma omp critical
+                {
+                    stopCalculation = 1;
+                }
+            }
+        }
     }
 
     return guess;
