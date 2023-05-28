@@ -26,18 +26,18 @@ double mutlak(double num);
 double akar(double x);
 double factorial(int n);
 double maclaurin_sin(double sudut, int keakuratan);
+double maclaurin_cos(double sudut, int keakuratan);
 double maclaurin_tan(double sudut, int keakuratan);
 double hitung_tinggi(double sudut, double jarak, int keakuratan);
 
 
 int main(){
     double start_time, end_time, elapsed_time;
-    
+    int maxThread = omp_get_max_threads();
+    omp_set_num_threads(maxThread);
+
     start_time = omp_get_wtime();
-    printf("%lf\n", hitung_tinggi(36.87, 12, 10));
-    printf("%lf\n", hitung_tinggi(36.87, 16, 10));
-    printf("%lf\n", hitung_tinggi(36.87, 20, 10));
-    printf("%lf\n", hitung_tinggi(36.87, 120, 10));
+    printf("%lf\n", maclaurin_tan(36.8, maxThread));
     end_time = omp_get_wtime();
 
     elapsed_time = end_time - start_time;
@@ -142,10 +142,34 @@ double maclaurin_sin(double sudut, int keakuratan) {
     return output;
 }
 
+double maclaurin_cos(double sudut, int keakuratan) {
+    double output = 0;
+    int i;
+
+    sudut = degree_to_radian(sudut);
+
+    //Menentukan cos dengan aproximasi maclaurin
+    #pragma omp parallel for
+    for (i = 0; i < keakuratan; i++) {
+        int eksponen = 2 * i;
+        double term = power(-1, i) * power(sudut, eksponen) / factorial(eksponen);
+
+        //barier untuk memastikan tidak ada yang bentrok mengakses variabel
+        #pragma omp critical
+        {
+            output += term;
+        }
+    }
+
+    return output;
+}
+
 //menghitung tan sebuah sudut dengan menggunakan sin
 double maclaurin_tan(double sudut, int keakuratan){
     double sinValue = maclaurin_sin(sudut, keakuratan);
-    double tanValue = sinValue / akar(1 - sinValue * sinValue);
+    double cosValue = maclaurin_cos(sudut, keakuratan);
+
+    double tanValue = sinValue/cosValue;
 
     return tanValue;
 }
