@@ -61,6 +61,7 @@ double power(double nilai, int eksponen) {
     double output = 1;
     int i;
 
+    #pragma omp parallel for reduction(*:output)
     for (i = 0; i < eksponen; i++) {
         output *= nilai;
     }
@@ -117,6 +118,7 @@ double factorial(int n) {
     double result = 1;
     int i;
 
+    #pragma omp parallel for reduction(*:result)
     for (i = 2; i <= n; i++) {
         result *= i;
     }
