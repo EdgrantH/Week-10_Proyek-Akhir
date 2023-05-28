@@ -20,13 +20,18 @@
 //nanti tambahin node linked list, gw saraninnya doubly linked list, tapi bebas. Datanya ada nama gedung dan tinggi gedung
 
 
-double degree_to_radian(double sudut);
+double degree_to_radian(double derajat);
 double power(double nilai, int eksponen);
+double mutlak(double num);
+double akar(double x);
 double factorial(int n);
 double maclaurin_sin(double sudut, int keakuratan);
+double maclaurin_tan(double sudut, int keakuratan);
+double hitung_tinggi(double sudut, double jarak, int keakuratan);
+
 
 int main(){
-    printf("%lf", maclaurin_sin(degree_to_radian(90), 10));
+    printf("%lf", hitung_tinggi(36.87, 12, 10));
 
     return 0;
 }
@@ -52,6 +57,27 @@ double power(double nilai, int eksponen) {
     return output;
 }
 
+double mutlak(double num) {
+     return (num < 0) ? -num : num;
+}
+
+double akar(double x) {
+    if (x <= 0) {
+        return 0;
+    }
+
+    double guess = x;
+    double nextGuess = 0.5 * (guess + x / guess);
+    double epsilon = 1e-7; // keakuratan
+
+    while (mutlak(nextGuess - guess) >= epsilon) {
+        guess = nextGuess;
+        nextGuess = 0.5 * (guess + x / guess);
+    }
+
+    return guess;
+}
+
 //menghitung factorial dari n
 double factorial(int n) {
     double result = 1;
@@ -69,6 +95,8 @@ double maclaurin_sin(double sudut, int keakuratan) {
     double output = 0;
     int i;
 
+    sudut = degree_to_radian(sudut);
+
     //pendekatan maclaurin untuk sin
     for (i = 0; i < keakuratan; i++) {
         int eksponen = 2 * i + 1;
@@ -80,13 +108,20 @@ double maclaurin_sin(double sudut, int keakuratan) {
 }
 
 //menghitung tan sebuah sudut dengan menggunakan sin
-float my_tan(float sudut){
+double maclaurin_tan(double sudut, int keakuratan){
+    double sinValue = maclaurin_sin(sudut, keakuratan);
+    double tanValue = sinValue / akar(1 - sinValue * sinValue);
 
+    return tanValue;
 }
 
 //menghitung tinggi sebuah gedung dengan sudut elevasi dan jarak dari alas
-float hitung_tinggi(float sudut, float jarak){
-    
+double hitung_tinggi(double sudut, double jarak, int keakuratan){
+    double tinggi;
+
+    tinggi = maclaurin_tan(sudut, keakuratan) * jarak;
+
+    return tinggi;
 }
 
 
