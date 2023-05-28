@@ -14,7 +14,7 @@
 #include <omp.h>
 #include "Utilites.h"
 
-#define PI 3.1415926432 
+#define PI 3.14159265358979323846
 
 //typdef node {}
 //nanti tambahin node linked list, gw saraninnya doubly linked list, tapi bebas. Datanya ada nama gedung dan tinggi gedung
@@ -26,12 +26,22 @@ double mutlak(double num);
 double akar(double x);
 double factorial(int n);
 double maclaurin_sin(double sudut, int keakuratan);
+double maclaurin_cos(double sudut, int keakuratan);
 double maclaurin_tan(double sudut, int keakuratan);
-double hitung_tinggi(double sudut, double jarak, int keakuratan);
 
 
 int main(){
-    printf("%lf", hitung_tinggi(36.87, 12, 10));
+    double start_time, end_time, elapsed_time;
+    int maxThread = omp_get_max_threads();
+    omp_set_num_threads(maxThread);
+
+    start_time = omp_get_wtime();
+    printf("%lf\n", maclaurin_tan(36.8, maxThread));
+    end_time = omp_get_wtime();
+
+    elapsed_time = end_time - start_time;
+
+    printf("Elapsed time: %f seconds\n", elapsed_time);
 
     return 0;
 }
@@ -50,6 +60,7 @@ double power(double nilai, int eksponen) {
     double output = 1;
     int i;
 
+    #pragma omp parallel for reduction(*:output)
     for (i = 0; i < eksponen; i++) {
         output *= nilai;
     }
@@ -68,11 +79,34 @@ double akar(double x) {
 
     double guess = x;
     double nextGuess = 0.5 * (guess + x / guess);
-    double epsilon = 1e-7; // keakuratan
+    double epsilon = 1e-7; // Desired level of precision
+    int stopCalculation = 0; // Flag to indicate stopping the calculation
+    int terminateLoop = 0; // Flag to indicate terminating the loop
 
-    while (mutlak(nextGuess - guess) >= epsilon) {
-        guess = nextGuess;
-        nextGuess = 0.5 * (guess + x / guess);
+    #pragma omp parallel shared(stopCalculation, terminateLoop)
+    {
+        while (!terminateLoop) {
+            guess =+ omp_get_thread_num();
+            // Check if the stopCalculation flag is set
+            #pragma omp critical
+            {
+                if (stopCalculation) {
+                    terminateLoop = 1;
+                }
+            }
+
+            guess = nextGuess;
+            nextGuess = 0.5 * (guess + x / guess);
+
+            // Check if the desired value is reached
+            if (mutlak(nextGuess - guess) < epsilon) {
+                // Set the stopCalculation flag for all threads
+                #pragma omp critical
+                {
+                    stopCalculation = 1;
+                }
+            }
+        }
     }
 
     return guess;
@@ -83,6 +117,7 @@ double factorial(int n) {
     double result = 1;
     int i;
 
+    #pragma omp parallel for reduction(*:result)
     for (i = 2; i <= n; i++) {
         result *= i;
     }
@@ -97,7 +132,8 @@ double maclaurin_sin(double sudut, int keakuratan) {
 
     sudut = degree_to_radian(sudut);
 
-    //pendekatan maclaurin untuk sin
+    //Menentukan sin dengan aproximasi maclaurin dan menggunakan multithreading dengan reduction variabel
+    #pragma omp parallel for reduction(+:output)
     for (i = 0; i < keakuratan; i++) {
         int eksponen = 2 * i + 1;
         double term = power(-1, i) * power(sudut, eksponen) / factorial(eksponen);
@@ -107,10 +143,34 @@ double maclaurin_sin(double sudut, int keakuratan) {
     return output;
 }
 
+double maclaurin_cos(double sudut, int keakuratan) {
+    double output = 0;
+    int i;
+
+    sudut = degree_to_radian(sudut);
+
+    //Menentukan cos dengan aproximasi maclaurin
+    #pragma omp parallel for
+    for (i = 0; i < keakuratan; i++) {
+        int eksponen = 2 * i;
+        double term = power(-1, i) * power(sudut, eksponen) / factorial(eksponen);
+
+        //barier untuk memastikan tidak ada yang bentrok mengakses variabel
+        #pragma omp critical
+        {
+            output += term;
+        }
+    }
+
+    return output;
+}
+
 //menghitung tan sebuah sudut dengan menggunakan sin
 double maclaurin_tan(double sudut, int keakuratan){
     double sinValue = maclaurin_sin(sudut, keakuratan);
-    double tanValue = sinValue / akar(1 - sinValue * sinValue);
+    double cosValue = maclaurin_cos(sudut, keakuratan);
+
+    double tanValue = sinValue / cosValue;
 
     return tanValue;
 }
