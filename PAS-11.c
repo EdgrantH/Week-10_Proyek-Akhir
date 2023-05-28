@@ -14,7 +14,7 @@
 #include <omp.h>
 #include "Utilites.h"
 
-#define PI 3.1415926432 
+#define PI 3.14159265358979323846
 
 //typdef node {}
 //nanti tambahin node linked list, gw saraninnya doubly linked list, tapi bebas. Datanya ada nama gedung dan tinggi gedung
@@ -131,7 +131,8 @@ double maclaurin_sin(double sudut, int keakuratan) {
 
     sudut = degree_to_radian(sudut);
 
-    //pendekatan maclaurin untuk sin
+    //Menentukan sin dengan aproximasi maclaurin dan menggunakan multithreading dengan reduction variabel
+    #pragma omp parallel for reduction(+:output)
     for (i = 0; i < keakuratan; i++) {
         int eksponen = 2 * i + 1;
         double term = power(-1, i) * power(sudut, eksponen) / factorial(eksponen);
