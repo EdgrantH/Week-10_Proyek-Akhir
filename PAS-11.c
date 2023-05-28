@@ -28,7 +28,6 @@ double factorial(int n);
 double maclaurin_sin(double sudut, int keakuratan);
 double maclaurin_cos(double sudut, int keakuratan);
 double maclaurin_tan(double sudut, int keakuratan);
-double hitung_tinggi(double sudut, double jarak, int keakuratan);
 
 
 int main(){
