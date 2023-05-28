@@ -169,7 +169,7 @@ double maclaurin_tan(double sudut, int keakuratan){
     double sinValue = maclaurin_sin(sudut, keakuratan);
     double cosValue = maclaurin_cos(sudut, keakuratan);
 
-    double tanValue = sinValue/cosValue;
+    double tanValue = sinValue / cosValue;
 
     return tanValue;
 }
