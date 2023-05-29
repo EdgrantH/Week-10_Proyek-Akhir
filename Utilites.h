@@ -65,11 +65,20 @@ void resetScreen(int color){
 	}
 }
 
-
 void print_box(int colorPreference, char *string, int length, int height){
     resetScreen(colorPreference);
     box('=', '|', length, height);
     gotoxy(3, (height + 1)/2);
     center_print (string, length);
     gotoxy(1, (height + 1));
+}
+
+void display_error(){
+	resetScreen(RED);
+	box('=', '|', 60, 3);
+	gotoxy(3,2);
+	center_print ("Inputan Salah, silahkan input ulang", 60);
+	gotoxy(1,4);
+	getch();
+	getchar();
 }

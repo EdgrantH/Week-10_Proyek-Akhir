@@ -24,6 +24,7 @@ struct node{
 
 typedef struct node node_t;
 
+//functinon perhitungan
 double degree_to_radian(double derajat);
 double power(double nilai, int eksponen);
 double mutlak(double num);
@@ -33,25 +34,70 @@ double maclaurin_sin(double sudut, int keakuratan);
 double maclaurin_cos(double sudut, int keakuratan);
 double maclaurin_tan(double sudut, int keakuratan);
 
+//function pendataan
 node_t *create_new_node (char namaGedung[], double tinggiGedung);
 node_t *insert_at_head (node_t **head, node_t *tmp);
 void printList(node_t *head);
 void delete_node (node_t **head, int position);
 void sort_list(node_t **head);
 
+//function menu
+void help();
+void menu_penutup();
+
+//function lainnya
+void write_settings(int input);
+int read_setting();
+
 int main(){
     //batas=====================================================
     node_t *head = NULL;
     node_t *tmp;    
-    int n;
+    int n, colorPreference = BLUE, endProgram = 0, menuInput;
     char nama_main[50];
     double nilai_main;
+
+    while (!endProgram){
+        print_box(colorPreference, "Main Menu", 60, 5);
+        printf ("1. Help\n");
+        printf ("2. Menghitung tinggi gedung\n");
+        printf ("3. Kalkulator trigonometri\n");
+        printf ("4. Keluar Program\n");
+        printf ("Pilih menu selanjutnya: "); scanf("%d", &menuInput);
+
+        switch (menuInput){
+            //help
+            case (1):
+                // help();
+                break;
+            
+            //Menghitung tinggi gedung
+            case (2):
+                // help();
+                break;
+            
+            //Kalkulator trigonommetri
+            case (3):
+                // help();
+                break;
+            
+            //keluar program
+            case (4):
+                endProgram = 1;//untuk menghentikan loop
+                menu_penutup();
+                break;
+            
+            default:
+                display_error();
+                break;
+        }
+    }
 
     printf ("\nMasukan jumlah bangunan: ");
     scanf("%d", &n);
 
     for (int i = 0; i < n; i++){
-        printf ("\nMakanan ke-%d:", i+1);
+        printf ("\nGedung ke-%d:", i+1);
         printf("\nMasukan nama bangunan: ");
         scanf(" %[^\n]", nama_main);
         printf("Masukan nilai bangunan: ");
@@ -59,7 +105,6 @@ int main(){
         tmp = create_new_node(nama_main, nilai_main);
         insert_at_head (&head, tmp);
     }
-
 
     printf("\n");
     printList(head);   
@@ -245,8 +290,8 @@ void printList(node_t *head){
 
     while (tmp != NULL){
         printf("\nGedung ke-%d\n", i);
-        printf ("%s\n", tmp->namaGedung);
-        printf ("%lf\n", tmp->tinggiGedung);
+        printf ("Nama:\t%s\n", tmp->namaGedung);
+        printf ("Tinggi:\t%.3lf m\n", tmp->tinggiGedung);
         tmp = tmp->next;
         i++;
     }
@@ -307,11 +352,19 @@ void sort_list(node_t **head) {
     }
 }
 
+
+void menu_penutup(){
+    print_box(GREEN, "Terima kasih udah memakai program kita", 60, 5);
+    getch();
+    exit(0);
+}
+
+
 void write_settings(int input){
 	FILE *fptr = fopen("settings.txt", "w+");
 
 	if (fptr == NULL){
-		// display_error();
+		display_error();
 	}
 
 	fprintf(fptr, "%d", input);
