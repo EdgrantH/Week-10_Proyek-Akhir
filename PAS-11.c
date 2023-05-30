@@ -44,6 +44,7 @@ void sort_list(node_t **head);
 //function menu
 void help();
 void menu_penutup();
+void menu_hitung(int coloPreference, node_t **head);
 
 //function lainnya
 void write_settings(int input);
@@ -65,7 +66,11 @@ int main(){
         printf ("4. Keluar Program\n");
         printf ("Pilih menu selanjutnya: "); scanf("%d", &menuInput);
 
+        
+
+
         switch (menuInput){
+            
             //help
             case (1):
                 // help();
@@ -73,7 +78,10 @@ int main(){
             
             //Menghitung tinggi gedung
             case (2):
-                // help();
+                menu_hitung(colorPreference, &head);
+                printf("\n");
+                printList(head);   
+                printf("\n");
                 break;
             
             //Kalkulator trigonommetri
@@ -93,18 +101,18 @@ int main(){
         }
     }
 
-    printf ("\nMasukan jumlah bangunan: ");
-    scanf("%d", &n);
+    // printf ("\nMasukan jumlah bangunan: ");
+    // scanf("%d", &n);
 
-    for (int i = 0; i < n; i++){
-        printf ("\nGedung ke-%d:", i+1);
-        printf("\nMasukan nama bangunan: ");
-        scanf(" %[^\n]", nama_main);
-        printf("Masukan nilai bangunan: ");
-        scanf(" %lf", &nilai_main);
-        tmp = create_new_node(nama_main, nilai_main);
-        insert_at_head (&head, tmp);
-    }
+    // for (int i = 0; i < n; i++){
+    //     printf ("\nGedung ke-%d:", i+1);
+    //     printf("\nMasukan nama bangunan: ");
+    //     scanf(" %[^\n]", nama_main);
+    //     printf("Masukan nilai bangunan: ");
+    //     scanf(" %lf", &nilai_main);
+    //     tmp = create_new_node(nama_main, nilai_main);
+    //     insert_at_head (&head, tmp);
+    // }
 
     printf("\n");
     printList(head);   
@@ -359,6 +367,35 @@ void menu_penutup(){
     exit(0);
 }
 
+void menu_hitung(int colorPreference, node_t **head){
+    char namaGedung[127];
+    double jarakGedung, sudutElevasi, tinggiGedung;
+    int menuInput;
+
+    print_box(colorPreference, "Perhitungan Tinggi Gedung", 60, 3);
+
+    printf("%-42s: ", "Jarak pengamat ke dasar gedung"); scanf(" %lf", &jarakGedung);
+    printf("%-42s: ", "Sudut elevasi ke puncak gedung (derajat)"); scanf(" %lf", &sudutElevasi);
+
+    tinggiGedung = hitung_tinggi(sudutElevasi, jarakGedung, 8);
+
+    printdup('-', 60);
+    printf ("Tinggi gedung = %.3lf\n", tinggiGedung);
+    printdup('-', 60);
+
+    printf ("\nApakah anda ingin save data ini?\n");
+    printf ("1. Iya\n");
+    printf ("2. Tidak\n");
+    scanf ("%d", &menuInput);
+
+    if (menuInput == 2) return;// menghentikan function
+    
+    print_box(colorPreference, "Savnig Data", 60, 3);
+    printf("%-20s: ", "Nama/label gedung"); scanf(" %[^\n]s", namaGedung);
+    
+    node_t *tmp = create_new_node(namaGedung, tinggiGedung);
+    insert_at_head (&head, tmp);
+}
 
 void write_settings(int input){
 	FILE *fptr = fopen("settings.txt", "w+");
