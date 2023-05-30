@@ -46,6 +46,7 @@ void help();
 void menu_penutup();
 void menu_hitung(int coloPreference, node_t **head);
 void menu_setting(int colorPreference);
+void menu_kalkulasi_sin(int colorPreference);
 
 //function lainnya
 void write_settings(int input);
@@ -60,18 +61,17 @@ int main(){
     double nilai_main;
 
     while (!endProgram){
+        omp_set_num_threads(omp_get_max_threads());
         colorPreference = read_setting();//membuat warna program sesuai dengan setting
 
         print_box(colorPreference, "Main Menu", 60, 5);
         printf ("1. Help\n");
         printf ("2. Menghitung tinggi gedung\n");
-        printf ("3. Kalkulator trigonometri\n");
+        printf ("3. Kalkulator sin\n");
         printf ("4. List gedung tersimpan\n");
         printf ("5. Settings\n");
         printf ("6. Keluar Program\n");
         printf ("Pilih menu selanjutnya: "); scanf("%d", &menuInput);
-
-        
 
 
         switch (menuInput){
@@ -86,9 +86,9 @@ int main(){
                 menu_hitung(colorPreference, &head);
                 break;
             
-            //Kalkulator trigonommetri
+            //Kalkulator sin
             case (3):
-                // help();
+                menu_kalkulasi_sin(colorPreference);
                 break;
             
             //List gedung tersimpan
@@ -440,6 +440,40 @@ void menu_setting(int colorPreference){
     }
 
     write_settings(input-1);
+}
+
+void menu_kalkulasi_sin(int colorPreference){
+    int threadInput;
+    double sudut, output;
+
+    print_box(colorPreference, "Kalkulator sin", 60, 3);
+    printf ("Jumlahthread: "); scanf("%d", &threadInput);
+    printf ("Sudut (derajat): "); scanf("%lf", &sudut);
+    
+    //set berapa banyak thread
+    omp_set_num_threads(threadInput);
+
+    //Menghitung sin dengan parallel programing
+    #pragma omp parallel
+    {
+        #pragma omp single
+        {
+            printdup('-', 60);
+            printf("Number of threads: %d\n", omp_get_num_threads());
+        }
+
+        #pragma omp task
+        {
+            output = maclaurin_sin(sudut, threadInput);
+        }
+
+        #pragma omp break
+        printf ("\tKalkulasi pada thread ke-%d selesai\n", omp_get_thread_num());
+    }
+
+    printdup('-', 60);
+    printf("Sin(%.0lf) = %.3lf\n", sudut, output);
+    getch();
 }
 
 void write_settings(int input){

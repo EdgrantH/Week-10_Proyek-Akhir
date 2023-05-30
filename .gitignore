@@ -6,3 +6,5 @@
 
 #ignore all .txt files
 *.txt
+
+/tempCodeRunnerFile.c
