@@ -45,6 +45,7 @@ void sort_list(node_t **head);
 void help();
 void menu_penutup();
 void menu_hitung(int coloPreference, node_t **head);
+void menu_setting(int colorPreference);
 
 //function lainnya
 void write_settings(int input);
@@ -59,11 +60,15 @@ int main(){
     double nilai_main;
 
     while (!endProgram){
+        colorPreference = read_setting();//membuat warna program sesuai dengan setting
+
         print_box(colorPreference, "Main Menu", 60, 5);
         printf ("1. Help\n");
         printf ("2. Menghitung tinggi gedung\n");
         printf ("3. Kalkulator trigonometri\n");
-        printf ("4. Keluar Program\n");
+        printf ("4. List gedung tersimpan\n");
+        printf ("5. Settings\n");
+        printf ("6. Keluar Program\n");
         printf ("Pilih menu selanjutnya: "); scanf("%d", &menuInput);
 
         
@@ -79,10 +84,6 @@ int main(){
             //Menghitung tinggi gedung
             case (2):
                 menu_hitung(colorPreference, &head);
-                printf("\n");
-                printList(head);   
-                printf("\n");
-                getch();
                 break;
             
             //Kalkulator trigonommetri
@@ -90,8 +91,21 @@ int main(){
                 // help();
                 break;
             
-            //keluar program
+            //List gedung tersimpan
             case (4):
+                printf("\n");
+                printList(head);   
+                printf("\n");
+                getch();
+                break;
+
+            // Settings
+            case (5):
+                menu_setting(colorPreference);
+                break;
+
+            //keluar program
+            case (6):
                 endProgram = 1;//untuk menghentikan loop
                 menu_penutup();
                 break;
@@ -295,6 +309,14 @@ void printList(node_t *head){
     node_t *tmp = head;
     int i = 1;
 
+    print_box(BLUE, "Data dalam list", 60, 5);
+
+    if (head == NULL){
+        printf ("\nTidak ada data dalam yang tersimpan\n");
+        return;
+    }
+
+
     printf ("\nData yang ada di dalam linked list adalah:\n");
 
     while (tmp != NULL){
@@ -396,6 +418,28 @@ void menu_hitung(int colorPreference, node_t **head){
     
     node_t *tmp = create_new_node(namaGedung, tinggiGedung);
     insert_at_head (head, tmp);
+}
+
+void menu_setting(int colorPreference){
+    int i, input;
+
+    print_box(colorPreference, "Settings", 60, 5);
+
+    printdup('-', 60);
+    printf ("Pilih warna: \n");
+    printf ("1. biru \n");
+    printf ("2. merah \n");
+    printf ("3. hijau \n");
+    printf ("4. kuning \n");
+    printdup('-', 60);
+    printf ("Input: ");
+    scanf ("%d", &input);
+
+    if (input < 1 || input > 4){
+        display_error();
+    }
+
+    write_settings(input-1);
 }
 
 void write_settings(int input){
