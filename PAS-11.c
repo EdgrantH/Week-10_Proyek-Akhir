@@ -82,6 +82,7 @@ int main(){
                 printf("\n");
                 printList(head);   
                 printf("\n");
+                getch();
                 break;
             
             //Kalkulator trigonommetri
@@ -394,7 +395,7 @@ void menu_hitung(int colorPreference, node_t **head){
     printf("%-20s: ", "Nama/label gedung"); scanf(" %[^\n]s", namaGedung);
     
     node_t *tmp = create_new_node(namaGedung, tinggiGedung);
-    insert_at_head (&head, tmp);
+    insert_at_head (head, tmp);
 }
 
 void write_settings(int input){
