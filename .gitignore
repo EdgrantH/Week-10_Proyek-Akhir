@@ -3,3 +3,8 @@
 
 # ignore ALL files in ANY directory named .vscode
 .vscode/
+
+#ignore all .txt files
+*.txt
+
+/tempCodeRunnerFile.c

@@ -44,6 +44,9 @@ void sort_list(node_t **head);
 //function menu
 void help();
 void menu_penutup();
+void menu_hitung(int coloPreference, node_t **head);
+void menu_setting(int colorPreference);
+void menu_kalkulasi_sin(int colorPreference);
 
 //function lainnya
 void write_settings(int input);
@@ -58,14 +61,21 @@ int main(){
     double nilai_main;
 
     while (!endProgram){
+        omp_set_num_threads(omp_get_max_threads());
+        colorPreference = read_setting();//membuat warna program sesuai dengan setting
+
         print_box(colorPreference, "Main Menu", 60, 5);
         printf ("1. Help\n");
         printf ("2. Menghitung tinggi gedung\n");
-        printf ("3. Kalkulator trigonometri\n");
-        printf ("4. Keluar Program\n");
+        printf ("3. Kalkulator sin\n");
+        printf ("4. List gedung tersimpan\n");
+        printf ("5. Settings\n");
+        printf ("6. Keluar Program\n");
         printf ("Pilih menu selanjutnya: "); scanf("%d", &menuInput);
 
+
         switch (menuInput){
+            
             //help
             case (1):
                 // help();
@@ -73,16 +83,29 @@ int main(){
             
             //Menghitung tinggi gedung
             case (2):
-                // help();
+                menu_hitung(colorPreference, &head);
                 break;
             
-            //Kalkulator trigonommetri
+            //Kalkulator sin
             case (3):
-                // help();
+                menu_kalkulasi_sin(colorPreference);
                 break;
             
-            //keluar program
+            //List gedung tersimpan
             case (4):
+                printf("\n");
+                printList(head);   
+                printf("\n");
+                getch();
+                break;
+
+            // Settings
+            case (5):
+                menu_setting(colorPreference);
+                break;
+
+            //keluar program
+            case (6):
                 endProgram = 1;//untuk menghentikan loop
                 menu_penutup();
                 break;
@@ -93,18 +116,18 @@ int main(){
         }
     }
 
-    printf ("\nMasukan jumlah bangunan: ");
-    scanf("%d", &n);
+    // printf ("\nMasukan jumlah bangunan: ");
+    // scanf("%d", &n);
 
-    for (int i = 0; i < n; i++){
-        printf ("\nGedung ke-%d:", i+1);
-        printf("\nMasukan nama bangunan: ");
-        scanf(" %[^\n]", nama_main);
-        printf("Masukan nilai bangunan: ");
-        scanf(" %lf", &nilai_main);
-        tmp = create_new_node(nama_main, nilai_main);
-        insert_at_head (&head, tmp);
-    }
+    // for (int i = 0; i < n; i++){
+    //     printf ("\nGedung ke-%d:", i+1);
+    //     printf("\nMasukan nama bangunan: ");
+    //     scanf(" %[^\n]", nama_main);
+    //     printf("Masukan nilai bangunan: ");
+    //     scanf(" %lf", &nilai_main);
+    //     tmp = create_new_node(nama_main, nilai_main);
+    //     insert_at_head (&head, tmp);
+    // }
 
     printf("\n");
     printList(head);   
@@ -286,6 +309,14 @@ void printList(node_t *head){
     node_t *tmp = head;
     int i = 1;
 
+    print_box(BLUE, "Data dalam list", 60, 5);
+
+    if (head == NULL){
+        printf ("\nTidak ada data dalam yang tersimpan\n");
+        return;
+    }
+
+
     printf ("\nData yang ada di dalam linked list adalah:\n");
 
     while (tmp != NULL){
@@ -359,6 +390,91 @@ void menu_penutup(){
     exit(0);
 }
 
+void menu_hitung(int colorPreference, node_t **head){
+    char namaGedung[127];
+    double jarakGedung, sudutElevasi, tinggiGedung;
+    int menuInput;
+
+    print_box(colorPreference, "Perhitungan Tinggi Gedung", 60, 3);
+
+    printf("%-42s: ", "Jarak pengamat ke dasar gedung"); scanf(" %lf", &jarakGedung);
+    printf("%-42s: ", "Sudut elevasi ke puncak gedung (derajat)"); scanf(" %lf", &sudutElevasi);
+
+    tinggiGedung = hitung_tinggi(sudutElevasi, jarakGedung, 8);
+
+    printdup('-', 60);
+    printf ("Tinggi gedung = %.3lf\n", tinggiGedung);
+    printdup('-', 60);
+
+    printf ("\nApakah anda ingin save data ini?\n");
+    printf ("1. Iya\n");
+    printf ("2. Tidak\n");
+    scanf ("%d", &menuInput);
+
+    if (menuInput == 2) return;// menghentikan function
+    
+    print_box(colorPreference, "Savnig Data", 60, 3);
+    printf("%-20s: ", "Nama/label gedung"); scanf(" %[^\n]s", namaGedung);
+    
+    node_t *tmp = create_new_node(namaGedung, tinggiGedung);
+    insert_at_head (head, tmp);
+}
+
+void menu_setting(int colorPreference){
+    int i, input;
+
+    print_box(colorPreference, "Settings", 60, 5);
+
+    printdup('-', 60);
+    printf ("Pilih warna: \n");
+    printf ("1. biru \n");
+    printf ("2. merah \n");
+    printf ("3. hijau \n");
+    printf ("4. kuning \n");
+    printdup('-', 60);
+    printf ("Input: ");
+    scanf ("%d", &input);
+
+    if (input < 1 || input > 4){
+        display_error();
+    }
+
+    write_settings(input-1);
+}
+
+void menu_kalkulasi_sin(int colorPreference){
+    int threadInput;
+    double sudut, output;
+
+    print_box(colorPreference, "Kalkulator sin", 60, 3);
+    printf ("Jumlahthread: "); scanf("%d", &threadInput);
+    printf ("Sudut (derajat): "); scanf("%lf", &sudut);
+    
+    //set berapa banyak thread
+    omp_set_num_threads(threadInput);
+
+    //Menghitung sin dengan parallel programing
+    #pragma omp parallel
+    {
+        #pragma omp single
+        {
+            printdup('-', 60);
+            printf("Number of threads: %d\n", omp_get_num_threads());
+        }
+
+        #pragma omp task
+        {
+            output = maclaurin_sin(sudut, threadInput);
+        }
+
+        #pragma omp break
+        printf ("\tKalkulasi pada thread ke-%d selesai\n", omp_get_thread_num());
+    }
+
+    printdup('-', 60);
+    printf("Sin(%.0lf) = %.3lf\n", sudut, output);
+    getch();
+}
 
 void write_settings(int input){
 	FILE *fptr = fopen("settings.txt", "w+");
