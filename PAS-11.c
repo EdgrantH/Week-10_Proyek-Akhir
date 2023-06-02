@@ -252,7 +252,7 @@ double maclaurin_cos(double sudut, int keakuratan) {
         int eksponen = 2 * i;
         double term = power(-1, i) * power(sudut, eksponen) / factorial(eksponen);
 
-        //barier untuk memastikan tidak ada yang bentrok mengakses variabel
+        //critical untuk memastikan tidak ada yang bentrok mengakses variabel
         #pragma omp critical
         {
             output += term;
