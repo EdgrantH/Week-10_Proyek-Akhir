@@ -78,7 +78,7 @@ int main(){
             
             //help
             case (1):
-                // help();
+                help();
                 break;
             
             //Menghitung tinggi gedung
@@ -502,3 +502,35 @@ int read_setting(){
 	fclose(fptr);
 	return input;
 }
+
+void help(){
+    int colorPreference = read_setting();
+    print_box(colorPreference, "Help", 60, 5);
+    printf ("\nDESKRIPSI PROGRAM\n");
+    printf ("Program  ini  adalah  program  yang  ditujukan untuk menyelesaikan tugas\n");
+    printf ("akhir  mata  kuliah  Pemrograman   Lanjutan.  Program  ini  dikembangkan \n");
+    printf ("untuk memecahkan  masalah aplikatif  dengan  minimal mengimplementasikan\n");
+    printf ("fungsi/modular,  user-friendly,  error handling, dynamic data structure, \n");
+    printf ("searching/sorting, file handling (read/write data ke file), dan parallel \n");
+    printf ("programming.\n\n");
+    printf ("NAMA PEMBUAT\n");
+    printf ("1. Edgrant Henderson Suryajaya   (2206025016)\n");
+    printf ("2. Farhan Nuzul Noufendri        (2206024442)\n");
+
+    getch();
+    print_box(colorPreference, "Help", 60, 5);
+    printf("Menu 1: Help\n");
+    printf("Deskripsi: Menampilkan bantuan dan penjelasan tentang program ini.\n\n");
+    printf("Menu 2: Menghitung tinggi gedung\n");
+    printf("Deskripsi: Menghitung tinggi sebuah gedung berdasarkan jarak pengamat ke dasar gedung dan sudut elevasi ke puncak gedung.\n\n");
+    printf("Menu 3: Kalkulator sin\n");
+    printf("Deskripsi: Menghitung nilai sinus dari sebuah sudut menggunakan metode Maclaurin.\n\n");
+    printf("Menu 4: List gedung tersimpan\n");
+    printf("Deskripsi: Menampilkan daftar gedung-gedung yang telah disimpan beserta tinggi masing-masing gedung.\n\n");
+    printf("Menu 5: Settings\n");
+    printf("Deskripsi: Mengatur preferensi warna program.\n\n");
+    printf("Menu 6: Keluar Program\n");
+    printf("Deskripsi: Keluar dari program.\n\n");
+    getch();
+}
+
