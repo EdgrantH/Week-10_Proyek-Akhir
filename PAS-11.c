@@ -38,7 +38,7 @@ double maclaurin_tan(double sudut, int keakuratan);
 node_t *create_new_node (char namaGedung[], double tinggiGedung);
 node_t *insert_at_head (node_t **head, node_t *tmp);
 void printList(node_t *head);
-void delete_node (node_t **head, int position);
+// void delete_node (node_t **head, int position);
 void sort_list(node_t **head);
 
 //function menu
@@ -94,6 +94,7 @@ int main(){
             //List gedung tersimpan
             case (4):
                 printf("\n");
+                sort_list(&head);
                 printList(head);   
                 printf("\n");
                 getch();
@@ -129,15 +130,15 @@ int main(){
     //     insert_at_head (&head, tmp);
     // }
 
-    printf("\n");
-    printList(head);   
-    printf("\n");
+    // printf("\n");
+    // printList(head);   
+    // printf("\n");
 
-    sort_list(&head);
+    
 
-    // Print the sorted list
-    printf("Linked list setelah diurutkan:\n");
-    printList(head);    
+    // // Print the sorted list
+    // printf("Linked list setelah diurutkan:\n");
+    // printList(head);    
     //batas==================================================
 
     return 0;
@@ -308,8 +309,9 @@ node_t *insert_at_head (node_t **head, node_t *tmp){
 void printList(node_t *head){
     node_t *tmp = head;
     int i = 1;
+    int colorPreference = read_setting();
 
-    print_box(BLUE, "Data dalam list", 60, 5);
+    print_box(colorPreference, "Data dalam list", 60, 5);
 
     if (head == NULL){
         printf ("\nTidak ada data dalam yang tersimpan\n");
@@ -320,7 +322,7 @@ void printList(node_t *head){
     printf ("\nData yang ada di dalam linked list adalah:\n");
 
     while (tmp != NULL){
-        printf("\nGedung ke-%d\n", i);
+        printf("\nGedung tertinggi ke-%d\n", i);
         printf ("Nama:\t%s\n", tmp->namaGedung);
         printf ("Tinggi:\t%.3lf m\n", tmp->tinggiGedung);
         tmp = tmp->next;
@@ -329,31 +331,31 @@ void printList(node_t *head){
     printf("\n");
 }
 
-void delete_node (node_t **head, int position){
-    node_t *current = *head;
-    node_t *prev = NULL;
-    int i = 1;
+// void delete_node (node_t **head, int position){
+//     node_t *current = *head;
+//     node_t *prev = NULL;
+//     int i = 1;
 
-    if (*head == NULL)
-        return; 
+//     if (*head == NULL)
+//         return; 
 
-    if (position == 1){
-        *head = (*head)->next;
-        free(current);
-        return;
-    }
+//     if (position == 1){
+//         *head = (*head)->next;
+//         free(current);
+//         return;
+//     }
 
-    while (current != NULL && i < position){
-        prev = current;
-        current = current->next;
-        i++;
-    }
+//     while (current != NULL && i < position){
+//         prev = current;
+//         current = current->next;
+//         i++;
+//     }
 
-    if (current != NULL){
-        prev->next = current->next;
-        free(current); 
-    }
-}
+//     if (current != NULL){
+//         prev->next = current->next;
+//         free(current); 
+//     }
+// }
 
 void sort_list(node_t **head) {
     node_t *current = *head;
@@ -367,7 +369,7 @@ void sort_list(node_t **head) {
     while (current != NULL) {
         index = current->next;
         while (index != NULL) {
-            if (current->tinggiGedung > index->tinggiGedung) {
+            if (current->tinggiGedung < index->tinggiGedung) {
                 strcpy(tempNama, current->namaGedung);
                 tempTinggi = current->tinggiGedung;
 
